@@ -1,62 +1,87 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../constants/style.dart';
+import '../../providers/data_provider.dart';
 
 class WeatherInformation extends StatelessWidget {
-  const WeatherInformation({
-    super.key,
-  });
-
   @override
   Widget build(BuildContext context) {
-    return Column(
+    final DataProvider dataProvider =
+        Provider.of<DataProvider>(context, listen: false);
+    return Wrap(
+      alignment: WrapAlignment.center,
       children: [
-        const Icon(Icons.sunny, color: Colors.white, size: 100),
-        const SizedBox(height: 25),
+        const Icon(Icons.sunny, color: Colors.white, size: 125),
+        const SizedBox(height: 30),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            const Text(
-              '31',
-              style: TextStyle(
+            Text(
+              double.parse(Provider.of<DataProvider>(context)
+                      .currentLoactionInformation
+                      .temperature)
+                  .toStringAsFixed(0),
+              style: const TextStyle(
                   color: Colors.white,
                   fontSize: 70,
                   fontWeight: FontWeight.w500),
             ),
+            const SizedBox(width: 10),
             Container(
               padding: const EdgeInsets.only(bottom: 17),
               child: Row(
                 children: [
-                  Container(
-                    width: 35,
-                    alignment: Alignment.center,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 2, vertical: 6),
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: const BorderRadius.only(
-                            bottomLeft: Radius.circular(5),
-                            topLeft: Radius.circular(5)),
-                        border: Border.all(color: Colors.white)),
-                    child: const Text(
-                      '°C ',
-                      style: TextStyle(color: Colors.red, fontSize: 22),
+                  GestureDetector(
+                    onTap: () {
+                      if (!dataProvider.currentLoactionInformation.isCelsius) {
+                        dataProvider.changeDegreeCelsiusInCurrentLoaction(
+                            status: true);
+                      }
+                    },
+                    child: Container(
+                      width: 35,
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 2, vertical: 6),
+                      decoration:
+                          dataProvider.currentLoactionInformation.isCelsius
+                              ? selectedDecoration(isLeft: true)
+                              : unSelectedDecoration(isLeft: true),
+                      child: Text(
+                        '°C ',
+                        style: dataProvider.currentLoactionInformation.isCelsius
+                            ? const TextStyle(color: Colors.red, fontSize: 22)
+                            : const TextStyle(
+                                color: Colors.white, fontSize: 22),
+                      ),
                     ),
                   ),
-                  Container(
-                    width: 35,
-                    alignment: Alignment.center,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 2, vertical: 6),
-                    decoration: BoxDecoration(
-                        borderRadius: const BorderRadius.only(
-                            bottomRight: Radius.circular(5),
-                            topRight: Radius.circular(5)),
-                        border: Border.all(
-                          color: Colors.white,
-                        )),
-                    child: const Text(
-                      '°F ',
-                      style: TextStyle(color: Colors.white, fontSize: 22),
+                  GestureDetector(
+                    onTap: () {
+                      if (dataProvider.currentLoactionInformation.isCelsius) {
+                        dataProvider.changeDegreeCelsiusInCurrentLoaction(
+                            status: false);
+                      }
+                    },
+                    child: Container(
+                      width: 35,
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 2, vertical: 6),
+                      decoration:
+                          dataProvider.currentLoactionInformation.isCelsius
+                              ? unSelectedDecoration(isLeft: false)
+                              : selectedDecoration(isLeft: false),
+                      child: Text(
+                        '°F ',
+                        style: !dataProvider
+                                .currentLoactionInformation.isCelsius
+                            ? const TextStyle(color: Colors.red, fontSize: 22)
+                            : const TextStyle(
+                                color: Colors.white, fontSize: 22),
+                      ),
                     ),
                   )
                 ],
@@ -64,7 +89,7 @@ class WeatherInformation extends StatelessWidget {
             )
           ],
         ),
-        const SizedBox(height: 15),
+        const SizedBox(height: 30),
         const Text(
           'Mostly Sunny',
           style: TextStyle(color: Colors.white, fontSize: 24),

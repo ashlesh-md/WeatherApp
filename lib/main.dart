@@ -1,10 +1,9 @@
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:weather_app/providers/data_provider.dart';
 import 'package:weather_app/providers/menu_provider.dart';
 import 'package:weather_app/screens/home_screen.dart';
-
-import 'widgets/scaffold_widgets/custom_background.dart';
 
 void main() => runApp(const MyApp());
 
@@ -14,7 +13,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [ChangeNotifierProvider(create: (context) => MenuProvider())],
+      providers: [
+        ChangeNotifierProvider(create: (context) => MenuProvider()),
+        ChangeNotifierProvider(create: (context) => DataProvider())
+      ],
       child: MaterialApp(
           title: 'Weather App',
           debugShowCheckedModeBanner: false,

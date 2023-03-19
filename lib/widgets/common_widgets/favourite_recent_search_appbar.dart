@@ -18,7 +18,7 @@ class FavouriteRecentSearchAppbar extends StatelessWidget
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Text(
           text,
-          style: TextStyle(color: Colors.black, fontSize: 24),
+          style: const TextStyle(color: Colors.black, fontSize: 24),
         ),
       ),
       leading: Builder(builder: (ctx) {

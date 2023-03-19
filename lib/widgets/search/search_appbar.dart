@@ -3,9 +3,16 @@ import 'package:provider/provider.dart';
 
 import '../../providers/menu_provider.dart';
 
-class SearchAppbar extends StatelessWidget implements PreferredSizeWidget {
+class SearchAppbar extends StatefulWidget implements PreferredSizeWidget {
+  @override
+  State<SearchAppbar> createState() => _SearchAppbarState();
+
   @override
   Size get preferredSize => const Size.fromHeight(60);
+}
+
+class _SearchAppbarState extends State<SearchAppbar> {
+  final TextEditingController textEditingController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -15,11 +22,20 @@ class SearchAppbar extends StatelessWidget implements PreferredSizeWidget {
           alignment: Alignment.centerLeft,
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: TextFormField(
+            controller: textEditingController,
+            onChanged: (value) {
+              setState(() {
+                if (textEditingController.text.length > 3) {
+                  Provider.of<MenuProvider>(context, listen: false)
+                      .setSearchText(text: textEditingController.text);
+                }
+              });
+            },
             decoration: InputDecoration(
                 hintText: 'Search for City',
                 hintStyle: TextStyle(
                     color: Colors.grey.shade500,
-                    fontSize: 18,
+                    fontSize: 20,
                     fontStyle: FontStyle.normal),
                 enabledBorder: InputBorder.none,
                 focusedBorder: InputBorder.none),
@@ -41,20 +57,23 @@ class SearchAppbar extends StatelessWidget implements PreferredSizeWidget {
             ));
       }),
       actions: [
-        GestureDetector(
-          onTap: () {
-            // Provider.of<MenuProvider>(context, listen: false)
-            //     .changeSearchStatus();
-          },
-          child: Container(
-            alignment: Alignment.center,
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: const Icon(
-              Icons.search,
-              size: 32,
+        if (textEditingController.text.length > 3)
+          GestureDetector(
+            onTap: () {
+              Provider.of<MenuProvider>(context, listen: false)
+                  .setSearchText(text: '');
+              textEditingController.clear();
+            },
+            child: Container(
+              alignment: Alignment.center,
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: const Icon(
+                color: Colors.black,
+                Icons.close,
+                size: 32,
+              ),
             ),
-          ),
-        )
+          )
       ],
     );
   }

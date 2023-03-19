@@ -1,16 +1,21 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:weather_app/providers/data_provider.dart';
 
 class FavouriteRecentSearchHeader extends StatelessWidget {
-  const FavouriteRecentSearchHeader({
-    super.key,
-    required this.countString,
-    required this.dialogString,
-    required this.removeString,
-  });
+  const FavouriteRecentSearchHeader(
+      {super.key,
+      required this.countString,
+      required this.dialogString,
+      required this.removeString,
+      required this.isFavouriteScreen});
 
   final String countString;
   final String dialogString;
   final String removeString;
+  final bool isFavouriteScreen;
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +50,21 @@ class FavouriteRecentSearchHeader extends StatelessWidget {
                         )),
                     TextButton(
                       onPressed: () {
+                        if (isFavouriteScreen) {
+                          Provider.of<DataProvider>(context, listen: false)
+                              .clearFavourites();
+                          log(Provider.of<DataProvider>(context, listen: false)
+                              .favourites
+                              .toString());
+                          print('isFavouriteScreen cleared');
+                        } else {
+                          Provider.of<DataProvider>(context, listen: false)
+                              .clearRecentSearches();
+                          log(Provider.of<DataProvider>(context, listen: false)
+                              .recentSearch
+                              .toString());
+                          print('clearRecentSearchess cleared');
+                        }
                         Navigator.of(context).pop();
                       },
                       child: const Text(
@@ -61,7 +81,7 @@ class FavouriteRecentSearchHeader extends StatelessWidget {
           },
           child: Text(
             removeString,
-            style: TextStyle(
+            style: const TextStyle(
                 color: Colors.white, fontSize: 17, fontStyle: FontStyle.normal),
           ),
         )

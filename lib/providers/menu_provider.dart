@@ -7,18 +7,27 @@ import 'package:weather_app/widgets/scaffold_widgets/custom_appbar.dart';
 import 'package:weather_app/widgets/search/search_appbar.dart';
 
 import '../widgets/favourites/favourite_body.dart';
+import '../widgets/search/search_autocomplete.dart';
 
 class MenuProvider extends ChangeNotifier {
   MenuItems _selectedMenu = MenuItems.home;
+
   bool _search = false;
+  String _searchText = '';
   final List<Widget> _menuHandlerWidgets = [
-    const HomeWidget(),
+    HomeWidget(),
     const FavouriteBody(),
     const RecentSearchBody(),
   ];
-  Widget _selectedWidget = const HomeWidget();
+  Widget _selectedWidget = HomeWidget();
   get selectedWidget => _selectedWidget;
   get selectedMenu => _selectedMenu;
+  get searchText => _searchText;
+
+  void setSearchText({required String text}) {
+    _searchText = text;
+    notifyListeners();
+  }
 
   Widget _selectedAppbar = CustomAppbar();
   get selectedAppbar => _selectedAppbar;
@@ -26,12 +35,7 @@ class MenuProvider extends ChangeNotifier {
     _search = !_search;
     if (_search) {
       _selectedAppbar = SearchAppbar();
-      _selectedWidget = Container(
-        decoration: BoxDecoration(
-            color: Colors.white,
-            border:
-                Border(top: BorderSide(color: Colors.grey.shade300, width: 1))),
-      );
+      _selectedWidget = SearchAutoComplete();
     } else {
       _selectedAppbar = CustomAppbar();
       changeMenu(menu: _selectedMenu);

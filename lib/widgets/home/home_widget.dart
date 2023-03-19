@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:weather_app/providers/data_provider.dart';
 
 import './current_location_information.dart';
 import './weather_information.dart';
 
 class HomeWidget extends StatelessWidget {
-  const HomeWidget({
-    super.key,
-  });
-
   @override
   Widget build(BuildContext context) {
+    final weatherInformation = Provider.of<DataProvider>(context)
+        .currentLoactionInformation
+        .weatherInfomations;
     return Column(
       children: [
         Expanded(
@@ -17,8 +18,8 @@ class HomeWidget extends StatelessWidget {
             alignment: Alignment.center,
             padding: const EdgeInsets.all(40),
             child: Column(
-              children: const [
-                Expanded(
+              children: [
+                const Expanded(
                   flex: 2,
                   child: CurrentLocationInformation(),
                 ),
@@ -31,7 +32,9 @@ class HomeWidget extends StatelessWidget {
           ),
         ),
         Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+          width: double.maxFinite,
+          alignment: Alignment.center,
           decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.1),
               border: Border(
@@ -41,93 +44,41 @@ class HomeWidget extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.cloudy_snowing,
-                      color: Colors.white,
-                      size: 30,
-                    ),
-                    const SizedBox(width: 10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Text(
-                          'Precipitation',
-                          style: TextStyle(color: Colors.white, fontSize: 18),
+                for (int index = 0; index < weatherInformation.length; index++)
+                  Container(
+                    padding: const EdgeInsets.only(right: 30),
+                    child: Row(
+                      children: [
+                        Icon(
+                          weatherInformation[index].icon,
+                          color: Colors.white,
+                          size: 32,
                         ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        Text(
-                          '22°-34°',
-                          style: TextStyle(color: Colors.white, fontSize: 18),
+                        const SizedBox(width: 10),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              weatherInformation[index].title,
+                              style: const TextStyle(
+                                  color: Colors.white, fontSize: 18),
+                            ),
+                            const SizedBox(
+                              height: 5,
+                            ),
+                            Text(
+                              weatherInformation[index].subTitle,
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w500),
+                            )
+                          ],
                         )
                       ],
-                    )
-                  ],
-                ),
-                const SizedBox(
-                  width: 20,
-                ),
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.cloudy_snowing,
-                      color: Colors.white,
-                      size: 30,
                     ),
-                    const SizedBox(width: 10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Text(
-                          'Precipitation',
-                          style: TextStyle(color: Colors.white, fontSize: 18),
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        Text(
-                          '22°-34°',
-                          style: TextStyle(color: Colors.white, fontSize: 18),
-                        )
-                      ],
-                    )
-                  ],
-                ),
-                const SizedBox(
-                  width: 20,
-                ),
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.cloudy_snowing,
-                      color: Colors.white,
-                      size: 30,
-                    ),
-                    const SizedBox(width: 10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Text(
-                          'Precipitation',
-                          style: TextStyle(color: Colors.white, fontSize: 18),
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        Text(
-                          '22°-34°',
-                          style: TextStyle(color: Colors.white, fontSize: 18),
-                        )
-                      ],
-                    )
-                  ],
-                ),
+                  )
               ],
             ),
           ),
