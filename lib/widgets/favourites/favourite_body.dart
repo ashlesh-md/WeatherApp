@@ -28,11 +28,11 @@ class FavouriteBody extends StatelessWidget {
           const SizedBox(
             height: 30,
           ),
-          if (favourites.isEmpty) Expanded(child: SizedBox()),
+          if (favourites.isEmpty) const Expanded(child: SizedBox()),
           if (favourites.isEmpty)
             const Center(
                 child: EmptySearchFavourite(text: 'No Favourites Added')),
-          if (favourites.isEmpty) Expanded(child: SizedBox()),
+          if (favourites.isEmpty) const Expanded(child: SizedBox()),
           Expanded(
             child: ListView.builder(
               itemCount: favourites.length,

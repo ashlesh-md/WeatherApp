@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -29,57 +31,57 @@ class DataProvider extends ChangeNotifier {
         isAddedToFavourite: true),
     WeatherInfoTile(
         climateIcon: Icons.sunny,
-        location: 'Udupi , Karnataka',
+        location: 'Mysore , Karnataka',
         temperature: '31',
         weatherStatus: 'Mostly Sunny',
         isAddedToFavourite: true),
     WeatherInfoTile(
         climateIcon: Icons.sunny,
-        location: 'Udupi , Karnataka',
+        location: 'Mandya , Karnataka',
         temperature: '31',
         weatherStatus: 'Mostly Sunny',
         isAddedToFavourite: true),
     WeatherInfoTile(
         climateIcon: Icons.sunny,
-        location: 'Udupi , Karnataka',
+        location: 'Maddur , Karnataka',
         temperature: '31',
         weatherStatus: 'Mostly Sunny',
         isAddedToFavourite: true),
     WeatherInfoTile(
         climateIcon: Icons.sunny,
-        location: 'Udupi , Karnataka',
+        location: 'Mangalore , Karnataka',
         temperature: '31',
         weatherStatus: 'Mostly Sunny',
         isAddedToFavourite: true),
   ];
   final List<WeatherInfoTile> _recentSearches = [
     WeatherInfoTile(
-        climateIcon: Icons.sunny,
+        climateIcon: Icons.cloudy_snowing,
         location: 'Udupi , Karnataka',
+        temperature: '31',
+        weatherStatus: 'Mostly Cloudy',
+        isAddedToFavourite: false),
+    WeatherInfoTile(
+        climateIcon: Icons.sunny,
+        location: 'Mysore , Karnataka',
+        temperature: '31',
+        weatherStatus: 'Rainy',
+        isAddedToFavourite: false),
+    WeatherInfoTile(
+        climateIcon: Icons.sunny,
+        location: 'Mandya , Karnataka',
         temperature: '31',
         weatherStatus: 'Mostly Sunny',
         isAddedToFavourite: false),
     WeatherInfoTile(
         climateIcon: Icons.sunny,
-        location: 'Udupi , Karnataka',
+        location: 'Maddur , Karnataka',
         temperature: '31',
         weatherStatus: 'Mostly Sunny',
         isAddedToFavourite: false),
     WeatherInfoTile(
         climateIcon: Icons.sunny,
-        location: 'Udupi , Karnataka',
-        temperature: '31',
-        weatherStatus: 'Mostly Sunny',
-        isAddedToFavourite: false),
-    WeatherInfoTile(
-        climateIcon: Icons.sunny,
-        location: 'Udupi , Karnataka',
-        temperature: '31',
-        weatherStatus: 'Mostly Sunny',
-        isAddedToFavourite: false),
-    WeatherInfoTile(
-        climateIcon: Icons.sunny,
-        location: 'Udupi , Karnataka',
+        location: 'Mangalore , Karnataka',
         temperature: '31',
         weatherStatus: 'Mostly Sunny',
         isAddedToFavourite: false),
@@ -174,9 +176,13 @@ class DataProvider extends ChangeNotifier {
 
   void removeFromFavouriteById({required String id}) {
     _favourites.removeWhere((element) => element.id == id);
-    _recentSearches
-        .firstWhere((element) => element.id == id)
-        .isAddedToFavourite = false;
+    try {
+      _recentSearches
+          .firstWhere((element) => element.id == id)
+          .isAddedToFavourite = false;
+    } catch (e) {
+      log(e.toString());
+    }
     if (_currentLoactionInformation.currentLocationId == id) {
       _currentLoactionInformation.isAddedToFavourite = false;
     }

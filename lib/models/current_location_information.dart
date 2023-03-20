@@ -32,7 +32,7 @@ class WeatherInformation {
 }
 
 class WeatherInfoTile {
-  String id = '${_counter++}';
+  final String id = '${_counter++}';
   String location;
   bool isAddedToFavourite;
   IconData climateIcon;

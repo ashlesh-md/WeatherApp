@@ -5,6 +5,8 @@ import '../../constants/style.dart';
 import '../../providers/data_provider.dart';
 
 class WeatherInformation extends StatelessWidget {
+  const WeatherInformation({super.key});
+
   @override
   Widget build(BuildContext context) {
     final DataProvider dataProvider =
