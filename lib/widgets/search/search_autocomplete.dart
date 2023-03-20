@@ -25,6 +25,8 @@ class SearchAutoComplete extends StatelessWidget {
                       .setCurrentInformationOnSearch();
                   Provider.of<MenuProvider>(context, listen: false)
                       .changeMenu(menu: MenuItems.home);
+                  Provider.of<MenuProvider>(context, listen: false)
+                      .setSearchText(text: '');
                 },
                 child: Container(
                   padding: const EdgeInsets.all(20),
