@@ -6,6 +6,7 @@ import 'package:weather_app/widgets/recent_search/recent_search_body.dart';
 import 'package:weather_app/widgets/scaffold_widgets/custom_appbar.dart';
 import 'package:weather_app/widgets/search/search_appbar.dart';
 
+import '../service/weather_data_service.dart';
 import '../widgets/favourites/favourite_body.dart';
 import '../widgets/search/search_autocomplete.dart';
 

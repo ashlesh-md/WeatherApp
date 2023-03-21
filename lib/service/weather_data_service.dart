@@ -7,12 +7,14 @@ import 'package:http/http.dart' as http;
 import '../models/current_location_information.dart';
 
 class WeatherDataService {
-  Future<CurrentLocationInfo> getWeatherData() async {
-    const String weatherDataUrl =
-        'https://api.openweathermap.org/data/2.5/weather?lat=13.34&lon=74.73&appid=e031dcd3ad8b42c64dce6e16089389d6';
+  Future<CurrentLocationInfo> getWeatherData({required String cityName}) async {
+    const String apiKey = 'e031dcd3ad8b42c64dce6e16089389d6';
+    // 'https://api.openweathermap.org/data/2.5/weather?lat=${location.latitude}&lon=${location.longitude}&appid=$e031dcd3ad8b42c64dce6e16089389d6',
+
+    final String weatherDataUrl =
+        'https://api.openweathermap.org/data/2.5/weather?q=$cityName&appid=$apiKey&units=metric';
     final url = Uri.parse(weatherDataUrl);
     final response = await http.get(url);
-
     if (response.statusCode == 200) {
       log(json.decode(response.body).toString());
       final weatherData = json.decode(response.body);

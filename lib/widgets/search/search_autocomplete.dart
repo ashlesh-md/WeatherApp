@@ -21,12 +21,14 @@ class SearchAutoComplete extends StatelessWidget {
           itemCount: _searchText.length,
           itemBuilder: (context, index) => GestureDetector(
                 onTap: () {
-                  Provider.of<DataProvider>(context, listen: false)
-                      .setCurrentInformationOnSearch();
-                  Provider.of<MenuProvider>(context, listen: false)
-                      .changeMenu(menu: MenuItems.home);
                   Provider.of<MenuProvider>(context, listen: false)
                       .setSearchText(text: '');
+
+                  Provider.of<DataProvider>(context, listen: false)
+                      .setCurrentInformationOnSearch(cityName: _searchText)
+                      .then((value) =>
+                          Provider.of<MenuProvider>(context, listen: false)
+                              .changeMenu(menu: MenuItems.home));
                 },
                 child: Container(
                   padding: const EdgeInsets.all(20),
@@ -35,9 +37,9 @@ class SearchAutoComplete extends StatelessWidget {
                       border: Border(
                           bottom: BorderSide(
                               color: Colors.grey.shade300, width: 1))),
-                  child: const Text(
-                    'Bangalore',
-                    style: TextStyle(fontSize: 16),
+                  child: Text(
+                    _searchText,
+                    style: const TextStyle(fontSize: 16),
                   ),
                 ),
               )),

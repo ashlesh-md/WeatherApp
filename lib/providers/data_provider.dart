@@ -24,68 +24,68 @@ class DataProvider extends ChangeNotifier {
       isAddedToFavourite: false,
       isCelsius: true);
   final List<WeatherInfoTile> _favourites = [
-    WeatherInfoTile(
-        climateIcon: Icons.sunny,
-        location: 'Udupi , Karnataka',
-        temperature: '31',
-        weatherStatus: 'Mostly Sunny',
-        isAddedToFavourite: true),
-    WeatherInfoTile(
-        climateIcon: Icons.sunny,
-        location: 'Mysore , Karnataka',
-        temperature: '31',
-        weatherStatus: 'Mostly Sunny',
-        isAddedToFavourite: true),
-    WeatherInfoTile(
-        climateIcon: Icons.sunny,
-        location: 'Mandya , Karnataka',
-        temperature: '31',
-        weatherStatus: 'Mostly Sunny',
-        isAddedToFavourite: true),
-    WeatherInfoTile(
-        climateIcon: Icons.sunny,
-        location: 'Maddur , Karnataka',
-        temperature: '31',
-        weatherStatus: 'Mostly Sunny',
-        isAddedToFavourite: true),
-    WeatherInfoTile(
-        climateIcon: Icons.sunny,
-        location: 'Mangalore , Karnataka',
-        temperature: '31',
-        weatherStatus: 'Mostly Sunny',
-        isAddedToFavourite: true),
+    // WeatherInfoTile(
+    //     climateIcon: Icons.sunny,
+    //     location: 'Udupi , Karnataka',
+    //     temperature: '31',
+    //     weatherStatus: 'Mostly Sunny',
+    //     isAddedToFavourite: true),
+    // WeatherInfoTile(
+    //     climateIcon: Icons.sunny,
+    //     location: 'Mysore , Karnataka',
+    //     temperature: '31',
+    //     weatherStatus: 'Mostly Sunny',
+    //     isAddedToFavourite: true),
+    // WeatherInfoTile(
+    //     climateIcon: Icons.sunny,
+    //     location: 'Mandya , Karnataka',
+    //     temperature: '31',
+    //     weatherStatus: 'Mostly Sunny',
+    //     isAddedToFavourite: true),
+    // WeatherInfoTile(
+    //     climateIcon: Icons.sunny,
+    //     location: 'Maddur , Karnataka',
+    //     temperature: '31',
+    //     weatherStatus: 'Mostly Sunny',
+    //     isAddedToFavourite: true),
+    // WeatherInfoTile(
+    //     climateIcon: Icons.sunny,
+    //     location: 'Mangalore , Karnataka',
+    //     temperature: '31',
+    //     weatherStatus: 'Mostly Sunny',
+    //     isAddedToFavourite: true),
   ];
   final List<WeatherInfoTile> _recentSearches = [
-    WeatherInfoTile(
-        climateIcon: Icons.cloudy_snowing,
-        location: 'Udupi , Karnataka',
-        temperature: '31',
-        weatherStatus: 'Mostly Cloudy',
-        isAddedToFavourite: false),
-    WeatherInfoTile(
-        climateIcon: Icons.sunny,
-        location: 'Mysore , Karnataka',
-        temperature: '31',
-        weatherStatus: 'Rainy',
-        isAddedToFavourite: false),
-    WeatherInfoTile(
-        climateIcon: Icons.sunny,
-        location: 'Mandya , Karnataka',
-        temperature: '31',
-        weatherStatus: 'Mostly Sunny',
-        isAddedToFavourite: false),
-    WeatherInfoTile(
-        climateIcon: Icons.sunny,
-        location: 'Maddur , Karnataka',
-        temperature: '31',
-        weatherStatus: 'Mostly Sunny',
-        isAddedToFavourite: false),
-    WeatherInfoTile(
-        climateIcon: Icons.sunny,
-        location: 'Mangalore , Karnataka',
-        temperature: '31',
-        weatherStatus: 'Mostly Sunny',
-        isAddedToFavourite: false),
+    // WeatherInfoTile(
+    //     climateIcon: Icons.cloudy_snowing,
+    //     location: 'Udupi , Karnataka',
+    //     temperature: '31',
+    //     weatherStatus: 'Mostly Cloudy',
+    //     isAddedToFavourite: false),
+    // WeatherInfoTile(
+    //     climateIcon: Icons.sunny,
+    //     location: 'Mysore , Karnataka',
+    //     temperature: '31',
+    //     weatherStatus: 'Rainy',
+    //     isAddedToFavourite: false),
+    // WeatherInfoTile(
+    //     climateIcon: Icons.sunny,
+    //     location: 'Mandya , Karnataka',
+    //     temperature: '31',
+    //     weatherStatus: 'Mostly Sunny',
+    //     isAddedToFavourite: false),
+    // WeatherInfoTile(
+    //     climateIcon: Icons.sunny,
+    //     location: 'Maddur , Karnataka',
+    //     temperature: '31',
+    //     weatherStatus: 'Mostly Sunny',
+    //     isAddedToFavourite: false),
+    // WeatherInfoTile(
+    //     climateIcon: Icons.sunny,
+    //     location: 'Mangalore , Karnataka',
+    //     temperature: '31',
+    //     weatherStatus: 'Mostly Sunny',
+    //     isAddedToFavourite: false),
   ];
 
   CurrentLocationInfo get currentLoactionInformation =>
@@ -134,14 +134,13 @@ class DataProvider extends ChangeNotifier {
     _currentLoactionInformation.isAddedToFavourite =
         !_currentLoactionInformation.isAddedToFavourite;
     if (_currentLoactionInformation.isAddedToFavourite) {
-      _favourites.add(
-        WeatherInfoTile(
-            climateIcon: _currentLoactionInformation.climateIcon,
-            location: _currentLoactionInformation.location,
-            temperature: _currentLoactionInformation.temperature,
-            weatherStatus: _currentLoactionInformation.weatherStatus,
-            isAddedToFavourite: true),
-      );
+      final WeatherInfoTile weatherData = WeatherInfoTile(
+          climateIcon: _currentLoactionInformation.climateIcon,
+          location: _currentLoactionInformation.location,
+          temperature: _currentLoactionInformation.temperature,
+          weatherStatus: _currentLoactionInformation.weatherStatus,
+          isAddedToFavourite: true);
+      if (!_favourites.contains(weatherData)) _favourites.add(weatherData);
       _currentLoactionInformation.currentLocationId = _favourites.last.id;
     } else {
       _favourites.removeWhere((element) =>
@@ -215,10 +214,18 @@ class DataProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setCurrentInformationOnSearch() {
-    WeatherDataService()
-        .getWeatherData()
-        .then((value) => _currentLoactionInformation = value);
+  Future<void> setCurrentInformationOnSearch({required String cityName}) async {
+    await WeatherDataService().getWeatherData(cityName: cityName).then((value) {
+      _currentLoactionInformation = value;
+      _recentSearches.add(
+        WeatherInfoTile(
+            climateIcon: _currentLoactionInformation.climateIcon,
+            location: _currentLoactionInformation.location,
+            temperature: _currentLoactionInformation.temperature,
+            weatherStatus: _currentLoactionInformation.weatherStatus,
+            isAddedToFavourite: false),
+      );
+    });
     notifyListeners();
   }
 }
