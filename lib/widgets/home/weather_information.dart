@@ -13,9 +13,10 @@ class WeatherInformation extends StatelessWidget {
         Provider.of<DataProvider>(context, listen: false);
     return Wrap(
       alignment: WrapAlignment.center,
+      spacing: double.maxFinite,
       children: [
-        const Icon(Icons.sunny, color: Colors.white, size: 125),
-        const SizedBox(height: 30),
+        const Icon(Icons.sunny, color: Colors.white, size: 145),
+        const SizedBox(height: 20),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.end,
@@ -91,7 +92,7 @@ class WeatherInformation extends StatelessWidget {
             )
           ],
         ),
-        const SizedBox(height: 30),
+        const SizedBox(height: 20),
         const Text(
           'Mostly Sunny',
           style: TextStyle(color: Colors.white, fontSize: 24),

@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:weather_app/service/weather_data_service.dart';
 
 import '../models/current_location_information.dart';
 
@@ -215,25 +216,9 @@ class DataProvider extends ChangeNotifier {
   }
 
   void setCurrentInformationOnSearch() {
-    _currentLoactionInformation = CurrentLocationInfo(
-        climateIcon: Icons.sunny,
-        dateTime: 'WED , 28 NOV 2018   11:35 AM',
-        temperature: '28',
-        location: 'Bangalore , Karnataka',
-        weatherInfomations: [
-          WeatherInformation(
-              icon: Icons.sunny, subTitle: '22° - 34°', title: 'Min - Max'),
-          WeatherInformation(
-              icon: Icons.cloudy_snowing,
-              subTitle: '0%',
-              title: 'Precepitation'),
-          WeatherInformation(
-              icon: Icons.water_drop_rounded,
-              subTitle: '47%',
-              title: 'Humidity')
-        ],
-        weatherStatus: 'Mostly Sunny',
-        isAddedToFavourite: false,
-        isCelsius: true);
+    WeatherDataService()
+        .getWeatherData()
+        .then((value) => _currentLoactionInformation = value);
+    notifyListeners();
   }
 }

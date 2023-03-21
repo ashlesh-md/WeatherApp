@@ -13,8 +13,9 @@ class CurrentLocationInformation extends StatelessWidget {
   Widget build(BuildContext context) {
     CurrentLocationInfo currentLocationData =
         Provider.of<DataProvider>(context).currentLoactionInformation;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
+    return Wrap(
+      alignment: WrapAlignment.center,
+      spacing: double.maxFinite,
       children: [
         Text(
           currentLocationData.dateTime,

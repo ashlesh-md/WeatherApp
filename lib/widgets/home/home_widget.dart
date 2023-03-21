@@ -6,6 +6,8 @@ import './current_location_information.dart';
 import './weather_information.dart';
 
 class HomeWidget extends StatelessWidget {
+  const HomeWidget({super.key});
+
   @override
   Widget build(BuildContext context) {
     final weatherInformation = Provider.of<DataProvider>(context)
@@ -18,8 +20,8 @@ class HomeWidget extends StatelessWidget {
             alignment: Alignment.center,
             padding: const EdgeInsets.all(40),
             child: Column(
-              children: [
-                const Expanded(
+              children: const [
+                Expanded(
                   flex: 2,
                   child: CurrentLocationInformation(),
                 ),

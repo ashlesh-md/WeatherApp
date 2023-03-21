@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:io' show Platform;
 import 'package:provider/provider.dart';
 import 'package:weather_app/constants/menu_items.dart';
 import 'package:weather_app/providers/menu_provider.dart';
@@ -30,9 +31,9 @@ class FavouriteRecentSearchAppbar extends StatelessWidget
             child: Container(
               alignment: Alignment.center,
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: const Icon(
+              child: Icon(
                 color: Colors.black,
-                Icons.arrow_back,
+                Platform.isIOS ? Icons.chevron_left : Icons.arrow_back,
                 size: 32,
               ),
             ));
