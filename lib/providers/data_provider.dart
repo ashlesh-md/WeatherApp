@@ -5,6 +5,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:weather_app/service/weather_data_service.dart';
 
 import '../models/current_location_information.dart';
+import '../storage/data_storage.dart';
 
 class DataProvider extends ChangeNotifier {
   CurrentLocationInfo _currentLoactionInformation = CurrentLocationInfo(
@@ -55,6 +56,7 @@ class DataProvider extends ChangeNotifier {
     //     weatherStatus: 'Mostly Sunny',
     //     isAddedToFavourite: true),
   ];
+
   final List<WeatherInfoTile> _recentSearches = [
     // WeatherInfoTile(
     //     climateIcon: Icons.cloudy_snowing,
@@ -96,6 +98,7 @@ class DataProvider extends ChangeNotifier {
 
   void clearRecentSearches() {
     _recentSearches.clear();
+    CounterStorage().deleteFile();
     Fluttertoast.showToast(
         msg: 'All the recent searches are cleared',
         toastLength: Toast.LENGTH_SHORT,
@@ -141,10 +144,20 @@ class DataProvider extends ChangeNotifier {
           weatherStatus: _currentLoactionInformation.weatherStatus,
           isAddedToFavourite: true);
       if (!_favourites.contains(weatherData)) _favourites.add(weatherData);
+      // if (_recentSearches.contains(weatherData)) {
+      //   _recentSearches[_recentSearches.indexOf(weatherData)]
+      //       .isAddedToFavourite = true;
+      // }
       _currentLoactionInformation.currentLocationId = _favourites.last.id;
     } else {
       _favourites.removeWhere((element) =>
           element.id == _currentLoactionInformation.currentLocationId);
+    }
+    for (var element in _recentSearches) {
+      log('$element' 'Addded');
+      if (element.location == _currentLoactionInformation.location) {
+        element.isAddedToFavourite = true;
+      }
     }
     Fluttertoast.showToast(
         msg: _currentLoactionInformation.isAddedToFavourite
@@ -216,6 +229,9 @@ class DataProvider extends ChangeNotifier {
 
   Future<void> setCurrentInformationOnSearch({required String cityName}) async {
     await WeatherDataService().getWeatherData(cityName: cityName).then((value) {
+      CounterStorage()
+          .readCounter()
+          .then((value) => CounterStorage().writeCounter('$value $cityName'));
       _currentLoactionInformation = value;
       _recentSearches.add(
         WeatherInfoTile(
@@ -223,7 +239,7 @@ class DataProvider extends ChangeNotifier {
             location: _currentLoactionInformation.location,
             temperature: _currentLoactionInformation.temperature,
             weatherStatus: _currentLoactionInformation.weatherStatus,
-            isAddedToFavourite: false),
+            isAddedToFavourite: _currentLoactionInformation.isAddedToFavourite),
       );
     });
     notifyListeners();
