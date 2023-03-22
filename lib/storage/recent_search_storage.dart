@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
 
-class CounterStorage {
+class RecentSearchStorage {
   Future<String> get _localPath async {
     final directory = await getApplicationDocumentsDirectory();
 
@@ -12,10 +12,10 @@ class CounterStorage {
 
   Future<File> get _localFile async {
     final path = await _localPath;
-    return File('$path/counter.txt');
+    return File('$path/recent_search.txt');
   }
 
-  Future<String> readCounter() async {
+  Future<String> readRecentSearchData() async {
     try {
       final file = await _localFile;
       // file.delete();
@@ -28,12 +28,12 @@ class CounterStorage {
     }
   }
 
-  Future<void> deleteFile() async {
+  Future<void> deleteRecentSearchData() async {
     final file = await _localFile;
     file.delete();
   }
 
-  Future<File> writeCounter(String value) async {
+  Future<File> writeRecentSearchData(String value) async {
     final file = await _localFile;
 
     return file.writeAsString(value);

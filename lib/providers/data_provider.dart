@@ -3,9 +3,10 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:weather_app/service/weather_data_service.dart';
+import 'package:weather_app/storage/favourites_storage.dart';
 
 import '../models/current_location_information.dart';
-import '../storage/data_storage.dart';
+import '../storage/recent_search_storage.dart';
 
 class DataProvider extends ChangeNotifier {
   CurrentLocationInfo _currentLoactionInformation = CurrentLocationInfo(
@@ -24,71 +25,9 @@ class DataProvider extends ChangeNotifier {
       weatherStatus: 'Mostly Sunny',
       isAddedToFavourite: false,
       isCelsius: true);
-  final List<WeatherInfoTile> _favourites = [
-    // WeatherInfoTile(
-    //     climateIcon: Icons.sunny,
-    //     location: 'Udupi , Karnataka',
-    //     temperature: '31',
-    //     weatherStatus: 'Mostly Sunny',
-    //     isAddedToFavourite: true),
-    // WeatherInfoTile(
-    //     climateIcon: Icons.sunny,
-    //     location: 'Mysore , Karnataka',
-    //     temperature: '31',
-    //     weatherStatus: 'Mostly Sunny',
-    //     isAddedToFavourite: true),
-    // WeatherInfoTile(
-    //     climateIcon: Icons.sunny,
-    //     location: 'Mandya , Karnataka',
-    //     temperature: '31',
-    //     weatherStatus: 'Mostly Sunny',
-    //     isAddedToFavourite: true),
-    // WeatherInfoTile(
-    //     climateIcon: Icons.sunny,
-    //     location: 'Maddur , Karnataka',
-    //     temperature: '31',
-    //     weatherStatus: 'Mostly Sunny',
-    //     isAddedToFavourite: true),
-    // WeatherInfoTile(
-    //     climateIcon: Icons.sunny,
-    //     location: 'Mangalore , Karnataka',
-    //     temperature: '31',
-    //     weatherStatus: 'Mostly Sunny',
-    //     isAddedToFavourite: true),
-  ];
+  final List<WeatherInfoTile> _favourites = [];
 
-  final List<WeatherInfoTile> _recentSearches = [
-    // WeatherInfoTile(
-    //     climateIcon: Icons.cloudy_snowing,
-    //     location: 'Udupi , Karnataka',
-    //     temperature: '31',
-    //     weatherStatus: 'Mostly Cloudy',
-    //     isAddedToFavourite: false),
-    // WeatherInfoTile(
-    //     climateIcon: Icons.sunny,
-    //     location: 'Mysore , Karnataka',
-    //     temperature: '31',
-    //     weatherStatus: 'Rainy',
-    //     isAddedToFavourite: false),
-    // WeatherInfoTile(
-    //     climateIcon: Icons.sunny,
-    //     location: 'Mandya , Karnataka',
-    //     temperature: '31',
-    //     weatherStatus: 'Mostly Sunny',
-    //     isAddedToFavourite: false),
-    // WeatherInfoTile(
-    //     climateIcon: Icons.sunny,
-    //     location: 'Maddur , Karnataka',
-    //     temperature: '31',
-    //     weatherStatus: 'Mostly Sunny',
-    //     isAddedToFavourite: false),
-    // WeatherInfoTile(
-    //     climateIcon: Icons.sunny,
-    //     location: 'Mangalore , Karnataka',
-    //     temperature: '31',
-    //     weatherStatus: 'Mostly Sunny',
-    //     isAddedToFavourite: false),
-  ];
+  final List<WeatherInfoTile> _recentSearches = [];
 
   CurrentLocationInfo get currentLoactionInformation =>
       _currentLoactionInformation;
@@ -98,7 +37,7 @@ class DataProvider extends ChangeNotifier {
 
   void clearRecentSearches() {
     _recentSearches.clear();
-    CounterStorage().deleteFile();
+    RecentSearchStorage().deleteRecentSearchData();
     Fluttertoast.showToast(
         msg: 'All the recent searches are cleared',
         toastLength: Toast.LENGTH_SHORT,
@@ -131,6 +70,8 @@ class DataProvider extends ChangeNotifier {
   //   notifyListeners();
   // }
   void clearFavourites() {
+    FavouritesStorage().deleteFavouritesData();
+
     for (var element in _favourites) {
       if (element.id == _currentLoactionInformation.currentLocationId) {
         _currentLoactionInformation.isAddedToFavourite = false;
@@ -260,17 +201,32 @@ class DataProvider extends ChangeNotifier {
 
   Future<void> setCurrentInformationOnSearch({required String cityName}) async {
     await WeatherDataService().getWeatherData(cityName: cityName).then((value) {
-      CounterStorage()
-          .readCounter()
-          .then((value) => CounterStorage().writeCounter('$value $cityName'));
+      RecentSearchStorage().readRecentSearchData().then((value) =>
+          RecentSearchStorage().writeRecentSearchData('$value $cityName'));
       _currentLoactionInformation = value;
       _recentSearches.add(
         WeatherInfoTile(
-            climateIcon: _currentLoactionInformation.climateIcon,
-            location: _currentLoactionInformation.location,
-            temperature: _currentLoactionInformation.temperature,
-            weatherStatus: _currentLoactionInformation.weatherStatus,
-            isAddedToFavourite: _currentLoactionInformation.isAddedToFavourite),
+            climateIcon: value.climateIcon,
+            location: value.location,
+            temperature: value.temperature,
+            weatherStatus: value.weatherStatus,
+            isAddedToFavourite: value.isAddedToFavourite),
+      );
+    });
+    notifyListeners();
+  }
+
+  Future<void> setFavouritesFromTheStorage({required String cityName}) async {
+    await WeatherDataService().getWeatherData(cityName: cityName).then((value) {
+      FavouritesStorage().readFavouritesData().then((value) =>
+          FavouritesStorage().writeFavouritesData('$value $cityName'));
+      _recentSearches.add(
+        WeatherInfoTile(
+            climateIcon: value.climateIcon,
+            location: value.location,
+            temperature: value.temperature,
+            weatherStatus: value.weatherStatus,
+            isAddedToFavourite: value.isAddedToFavourite),
       );
     });
     notifyListeners();

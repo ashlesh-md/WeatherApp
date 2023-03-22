@@ -5,9 +5,7 @@ import 'package:weather_app/providers/data_provider.dart';
 import 'package:weather_app/providers/menu_provider.dart';
 import 'package:weather_app/screens/home_screen.dart';
 
-import 'storage/data_storage.dart';
-
-void main() => runApp(MyApp());
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -37,7 +35,7 @@ class MyApp extends StatelessWidget {
               child: AnimatedSplashScreen(
                 duration: 3000,
                 splash: Image.asset('assets/images/splash/logo_splash.png'),
-                nextScreen: HomeScreen(storage: CounterStorage()),
+                nextScreen: HomeScreen(),
                 splashTransition: SplashTransition.fadeTransition,
                 backgroundColor: Colors.transparent,
               ),

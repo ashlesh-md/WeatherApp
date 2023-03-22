@@ -2,33 +2,40 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:weather_app/storage/favourites_storage.dart';
+import 'package:weather_app/storage/recent_search_storage.dart';
 
 import '../providers/data_provider.dart';
 import '../providers/menu_provider.dart';
-import '../storage/data_storage.dart';
 import '../widgets/scaffold_widgets/custom_background.dart';
 import '../widgets/scaffold_widgets/custom_drawer.dart';
 
 class HomeScreen extends StatelessWidget {
-  HomeScreen({super.key, required this.storage});
-  final CounterStorage storage;
-
+  HomeScreen({super.key});
   bool isFirst = true;
+  final recentSearchStorage = RecentSearchStorage();
+  final favouritesStorage = FavouritesStorage();
 
   @override
   Widget build(BuildContext context) {
     if (isFirst) {
-      storage.readCounter().then((value) {
-        print(value);
+      recentSearchStorage.readRecentSearchData().then((value) {
         if (value.isNotEmpty) {
           value.split(' ').toSet().toList().forEach((element) {
-            log(element);
+            // log(element);
             Provider.of<DataProvider>(context, listen: false)
-                .setCurrentInformationOnSearch(cityName: element)
-                .then((value) => log(element));
+                .setCurrentInformationOnSearch(cityName: element);
           });
         }
-      });
+      }).then((value) => favouritesStorage.readFavouritesData().then((fav) {
+            if (fav.isNotEmpty) {
+              fav.split(' ').toSet().toList().forEach((element) {
+                log('Favourite : $element');
+                Provider.of<DataProvider>(context, listen: false)
+                    .setFavouritesFromTheStorage(cityName: element);
+              });
+            }
+          }));
       isFirst = false;
     }
 
