@@ -15,7 +15,8 @@ class WeatherInformation extends StatelessWidget {
       alignment: WrapAlignment.center,
       spacing: double.maxFinite,
       children: [
-        const Icon(Icons.sunny, color: Colors.white, size: 145),
+        // const Icon(Icons.sunny, color: Colors.white, size: 145),
+        Image.network('https://openweathermap.org/img/wn/10d@2x.png'),
         const SizedBox(height: 20),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -93,9 +94,9 @@ class WeatherInformation extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 20),
-        const Text(
-          'Mostly Sunny',
-          style: TextStyle(color: Colors.white, fontSize: 24),
+        Text(
+          dataProvider.currentLoactionInformation.weatherStatus,
+          style: const TextStyle(color: Colors.white, fontSize: 24),
         )
       ],
     );

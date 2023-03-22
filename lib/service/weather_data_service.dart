@@ -25,17 +25,24 @@ class WeatherDataService {
           location: '${weatherData["name"]} , ${weatherData['sys']['country']}',
           weatherInfomations: [
             WeatherInformation(
-                icon: Icons.sunny, subTitle: '22° - 34°', title: 'Min - Max'),
+                icon: Icons.sunny,
+                subTitle:
+                    '${weatherData['main']['temp_max']}° - ${weatherData['main']['temp_min']}°',
+                title: 'Min - Max'),
             WeatherInformation(
                 icon: Icons.cloudy_snowing,
-                subTitle: '0%',
-                title: 'Precepitation'),
+                subTitle: '${weatherData['main']['sea_level']}',
+                title: 'See level'),
             WeatherInformation(
                 icon: Icons.water_drop_rounded,
-                subTitle: '47%',
-                title: 'Humidity')
+                subTitle: '${weatherData['main']['humidity']}%',
+                title: 'Humidity'),
+            WeatherInformation(
+                icon: Icons.visibility,
+                subTitle: '${weatherData['visibility']}',
+                title: 'Visibility')
           ],
-          weatherStatus: 'Mostly Sunny',
+          weatherStatus: weatherData['weather'][0]['description'],
           isAddedToFavourite: false,
           isCelsius: true);
     } else {
