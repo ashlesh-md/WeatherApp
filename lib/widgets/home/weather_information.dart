@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:rive/rive.dart';
 
 import '../../constants/style.dart';
 import '../../providers/data_provider.dart';
@@ -15,9 +16,13 @@ class WeatherInformation extends StatelessWidget {
       alignment: WrapAlignment.center,
       spacing: double.maxFinite,
       children: [
-        // const Icon(Icons.sunny, color: Colors.white, size: 145),
-        Image.network('https://openweathermap.org/img/wn/10d@2x.png'),
-        const SizedBox(height: 20),
+        const SizedBox(
+          height: 200,
+          width: 200,
+          child: RiveAnimation.asset('assets/animation/sunny.riv',
+              alignment: Alignment.center, fit: BoxFit.fitHeight),
+        ),
+        // const SizedBox(height: 20),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.end,

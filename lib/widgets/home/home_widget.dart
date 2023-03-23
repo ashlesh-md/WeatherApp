@@ -22,11 +22,10 @@ class HomeWidget extends StatelessWidget {
             child: Column(
               children: const [
                 Expanded(
-                  flex: 2,
                   child: CurrentLocationInformation(),
                 ),
                 Expanded(
-                  flex: 3,
+                  flex: 2,
                   child: WeatherInformation(),
                 ),
               ],
