@@ -12,9 +12,13 @@ class CurrentLocationInfo {
   String weatherStatus;
   String date;
   DateTime time;
+  double lat;
+  double long;
+  String isAm;
   List<WeatherInformation> weatherInfomations;
   CurrentLocationInfo(
       {required this.location,
+      required this.isAm,
       this.isAddedToFavourite = false,
       required this.climateIcon,
       required this.temperature,
@@ -22,6 +26,8 @@ class CurrentLocationInfo {
       required this.weatherStatus,
       required this.date,
       required this.time,
+      required this.lat,
+      required this.long,
       required this.weatherInfomations});
 }
 

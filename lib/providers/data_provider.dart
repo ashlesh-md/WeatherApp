@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:weather_app/service/weather_data_service.dart';
 import 'package:weather_app/storage/favourites_storage.dart';
 
@@ -10,23 +11,26 @@ import '../models/current_location_information.dart';
 import '../storage/recent_search_storage.dart';
 
 class DataProvider extends ChangeNotifier {
-  CurrentLocationInfo _currentLoactionInformation = CurrentLocationInfo(
-      climateIcon: Icons.sunny,
-      date: 'WED , 28 NOV 2018',
-      time: DateTime.now(),
-      temperature: '31',
-      location: 'Udupi , Karnataka',
-      weatherInfomations: [
-        WeatherInformation(
-            icon: Icons.sunny, subTitle: '22° - 34°', title: 'Min - Max'),
-        WeatherInformation(
-            icon: Icons.cloudy_snowing, subTitle: '0%', title: 'Precepitation'),
-        WeatherInformation(
-            icon: Icons.water_drop_rounded, subTitle: '47%', title: 'Humidity')
-      ],
-      weatherStatus: 'Mostly Sunny',
-      isAddedToFavourite: false,
-      isCelsius: true);
+  late CurrentLocationInfo _currentLoactionInformation;
+  Future<void> getCurrentLocation() async {
+    final hasPermission = await _handleLocationPermission();
+    if (!hasPermission) {
+      log('No Permission');
+    }
+    await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
+        .then((Position position) async {
+      await WeatherDataService()
+          .getWeatherDataByLatLong(
+              lat: position.latitude, long: position.longitude)
+          .then((value) {
+        _currentLoactionInformation = value!;
+      });
+    }).catchError((e) {
+      debugPrint(e.toString());
+    });
+    notifyListeners();
+  }
+
   void setCurrentLocationTime({required DateTime time}) {
     _currentLoactionInformation.time = time;
     notifyListeners();
@@ -43,7 +47,7 @@ class DataProvider extends ChangeNotifier {
   String _temporaryTemprature = '';
 
   void clearRecentSearches() {
-    _recentSearches.clear();
+    getCurrentLocation();
     RecentSearchStorage().deleteRecentSearchData();
     Fluttertoast.showToast(
         msg: 'All the recent searches are cleared',
@@ -207,10 +211,11 @@ class DataProvider extends ChangeNotifier {
   }
 
   Future<void> setCurrentInformationOnSearch({required String cityName}) async {
+    CurrentLocationInfo? temp;
     await WeatherDataService().getWeatherData(cityName: cityName).then((value) {
       RecentSearchStorage().readRecentSearchData().then((value) =>
           RecentSearchStorage().writeRecentSearchData('$value $cityName'));
-      _currentLoactionInformation = value;
+      _currentLoactionInformation = value!;
       _recentSearches.add(
         WeatherInfoTile(
             climateIcon: value.climateIcon,
@@ -229,7 +234,7 @@ class DataProvider extends ChangeNotifier {
           FavouritesStorage().writeFavouritesData('$value $cityName'));
       _recentSearches.add(
         WeatherInfoTile(
-            climateIcon: value.climateIcon,
+            climateIcon: value!.climateIcon,
             location: value.location,
             temperature: value.temperature,
             weatherStatus: value.weatherStatus,
@@ -237,5 +242,35 @@ class DataProvider extends ChangeNotifier {
       );
     });
     notifyListeners();
+  }
+
+  Future<bool> _handleLocationPermission() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      //     content: Text('Location services are disabled. Please enable the services')));
+      log('Location services are disabled. Please enable the services');
+      return false;
+    }
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //     const SnackBar(content: Text('Location permissions are denied')));
+        log('Location permissions are denied');
+        return false;
+      }
+    }
+    if (permission == LocationPermission.deniedForever) {
+      // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      //     content: Text('Location permissions are permanently denied, we cannot request permissions.')));
+      log('Location permissions are permanently denied, we cannot request permissions.');
+      return false;
+    }
+    return true;
   }
 }

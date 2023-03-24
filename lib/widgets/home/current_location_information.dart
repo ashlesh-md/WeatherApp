@@ -20,6 +20,7 @@ class CurrentLocationInformation extends StatelessWidget {
     CurrentLocationInfo currentLocationData =
         Provider.of<DataProvider>(context).currentLoactionInformation;
     if (isFirst) {
+      // amOrPm = currentLocationData.isAm ? 'AM' : 'PM';
       time = Provider.of<DataProvider>(context).currentLoactionInformation.time;
       Timer.periodic(const Duration(seconds: 1), (timer) {
         time = time.add(const Duration(seconds: 1));
@@ -34,7 +35,7 @@ class CurrentLocationInformation extends StatelessWidget {
       spacing: double.maxFinite,
       children: [
         Text(
-          '${currentLocationData.date}  ${time.hour}:${time.minute}:${time.second}',
+          '${currentLocationData.date}  ${time.hour}:${time.minute}:${time.second} ${currentLocationData.isAm}',
           textAlign: TextAlign.center,
           style: TextStyle(
               letterSpacing: 2,

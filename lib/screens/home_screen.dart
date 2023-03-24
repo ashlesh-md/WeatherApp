@@ -19,23 +19,28 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (isFirst) {
-      recentSearchStorage.readRecentSearchData().then((value) {
-        if (value.isNotEmpty) {
-          value.split(' ').toSet().toList().forEach((element) {
-            // log(element);
-            Provider.of<DataProvider>(context, listen: false)
-                .setCurrentInformationOnSearch(cityName: element);
-          });
-        }
-      }).then((value) => favouritesStorage.readFavouritesData().then((fav) {
-            if (fav.isNotEmpty) {
-              fav.split(' ').toSet().toList().forEach((element) {
-                log('Favourite : $element');
-                Provider.of<DataProvider>(context, listen: false)
-                    .setFavouritesFromTheStorage(cityName: element);
-              });
-            }
-          }));
+      try {
+        Provider.of<DataProvider>(context, listen: false).getCurrentLocation();
+        recentSearchStorage.readRecentSearchData().then((value) {
+          if (value.isNotEmpty) {
+            value.split(' ').toSet().toList().forEach((element) {
+              // log(element);
+              Provider.of<DataProvider>(context, listen: false)
+                  .setCurrentInformationOnSearch(cityName: element);
+            });
+          }
+        }).then((value) => favouritesStorage.readFavouritesData().then((fav) {
+              if (fav.isNotEmpty) {
+                fav.split(' ').toSet().toList().forEach((element) {
+                  log('Favourite : $element');
+                  Provider.of<DataProvider>(context, listen: false)
+                      .setFavouritesFromTheStorage(cityName: element);
+                });
+              }
+            }));
+      } catch (e) {
+        Provider.of<DataProvider>(context, listen: false).getCurrentLocation();
+      }
       isFirst = false;
     }
 
