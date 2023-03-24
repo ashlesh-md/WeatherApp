@@ -10,7 +10,6 @@ class WeatherDataService {
   Future<CurrentLocationInfo> getWeatherData({required String cityName}) async {
     const String apiKey = 'e031dcd3ad8b42c64dce6e16089389d6';
     // 'https://api.openweathermap.org/data/2.5/weather?lat=${location.latitude}&lon=${location.longitude}&appid=$e031dcd3ad8b42c64dce6e16089389d6',
-
     final String weatherDataUrl =
         'https://api.openweathermap.org/data/2.5/weather?q=$cityName&appid=$apiKey&units=metric';
     final url = Uri.parse(weatherDataUrl);
@@ -20,7 +19,8 @@ class WeatherDataService {
       final weatherData = json.decode(response.body);
       return CurrentLocationInfo(
           climateIcon: Icons.sunny,
-          dateTime: 'WED , 28 NOV 2018   11:35 AM',
+          date: 'WED , 28 NOV 2018',
+          time: DateTime.now(),
           temperature: '${weatherData['main']['temp']}',
           location: '${weatherData["name"]} , ${weatherData['sys']['country']}',
           weatherInfomations: [

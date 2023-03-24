@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:weather_app/providers/data_provider.dart';
@@ -5,20 +8,33 @@ import 'package:weather_app/providers/data_provider.dart';
 import '../../models/current_location_information.dart';
 
 class CurrentLocationInformation extends StatelessWidget {
-  const CurrentLocationInformation({
+  CurrentLocationInformation({
     super.key,
   });
+
+  bool isFirst = true;
+  DateTime time = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
     CurrentLocationInfo currentLocationData =
         Provider.of<DataProvider>(context).currentLoactionInformation;
+    if (isFirst) {
+      time = Provider.of<DataProvider>(context).currentLoactionInformation.time;
+      Timer.periodic(const Duration(seconds: 1), (timer) {
+        time = time.add(const Duration(seconds: 1));
+        Provider.of<DataProvider>(context, listen: false)
+            .setCurrentLocationTime(time: time);
+      });
+
+      isFirst = false;
+    }
     return Wrap(
       alignment: WrapAlignment.center,
       spacing: double.maxFinite,
       children: [
         Text(
-          currentLocationData.dateTime,
+          '${currentLocationData.date}  ${time.hour}:${time.minute}:${time.second}',
           textAlign: TextAlign.center,
           style: TextStyle(
               letterSpacing: 2,

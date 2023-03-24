@@ -11,21 +11,21 @@ class SearchAutoComplete extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String _searchText = Provider.of<MenuProvider>(context).searchText;
+    String searchText = Provider.of<MenuProvider>(context).searchText;
     return Container(
       decoration: BoxDecoration(
           color: Colors.white,
           border:
               Border(top: BorderSide(color: Colors.grey.shade300, width: 1))),
       child: ListView.builder(
-          itemCount: _searchText.length,
+          itemCount: searchText.length,
           itemBuilder: (context, index) => GestureDetector(
                 onTap: () {
                   Provider.of<MenuProvider>(context, listen: false)
                       .setSearchText(text: '');
 
                   Provider.of<DataProvider>(context, listen: false)
-                      .setCurrentInformationOnSearch(cityName: _searchText)
+                      .setCurrentInformationOnSearch(cityName: searchText)
                       .then((value) =>
                           Provider.of<MenuProvider>(context, listen: false)
                               .changeMenu(menu: MenuItems.home));
@@ -38,7 +38,7 @@ class SearchAutoComplete extends StatelessWidget {
                           bottom: BorderSide(
                               color: Colors.grey.shade300, width: 1))),
                   child: Text(
-                    _searchText,
+                    searchText,
                     style: const TextStyle(fontSize: 16),
                   ),
                 ),

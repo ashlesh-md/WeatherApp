@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -11,7 +12,8 @@ import '../storage/recent_search_storage.dart';
 class DataProvider extends ChangeNotifier {
   CurrentLocationInfo _currentLoactionInformation = CurrentLocationInfo(
       climateIcon: Icons.sunny,
-      dateTime: 'WED , 28 NOV 2018   11:35 AM',
+      date: 'WED , 28 NOV 2018',
+      time: DateTime.now(),
       temperature: '31',
       location: 'Udupi , Karnataka',
       weatherInfomations: [
@@ -25,6 +27,11 @@ class DataProvider extends ChangeNotifier {
       weatherStatus: 'Mostly Sunny',
       isAddedToFavourite: false,
       isCelsius: true);
+  void setCurrentLocationTime({required DateTime time}) {
+    _currentLoactionInformation.time = time;
+    notifyListeners();
+  }
+
   final List<WeatherInfoTile> _favourites = [];
 
   final List<WeatherInfoTile> _recentSearches = [];

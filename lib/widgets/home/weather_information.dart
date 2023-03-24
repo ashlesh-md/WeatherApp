@@ -4,6 +4,7 @@ import 'package:rive/rive.dart';
 
 import '../../constants/style.dart';
 import '../../providers/data_provider.dart';
+import 'dart:io' show Platform;
 
 class WeatherInformation extends StatelessWidget {
   const WeatherInformation({super.key});
@@ -16,13 +17,12 @@ class WeatherInformation extends StatelessWidget {
       alignment: WrapAlignment.center,
       spacing: double.maxFinite,
       children: [
-        const SizedBox(
-          height: 200,
-          width: 200,
-          child: RiveAnimation.asset('assets/animation/sunny.riv',
-              alignment: Alignment.center, fit: BoxFit.fitHeight),
+        SizedBox(
+          height: Platform.isMacOS ? 350 : 200,
+          width: Platform.isMacOS ? 350 : 200,
+          child: const RiveAnimation.asset('assets/animation/sunny.riv',
+              alignment: Alignment.center, fit: BoxFit.fill),
         ),
-        // const SizedBox(height: 20),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.end,

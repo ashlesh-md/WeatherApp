@@ -4,22 +4,24 @@ int _counter = 11111111;
 
 class CurrentLocationInfo {
   String currentLocationId = '';
-  String dateTime;
   String location;
   bool isAddedToFavourite;
   IconData climateIcon;
   String temperature;
   bool isCelsius;
   String weatherStatus;
+  String date;
+  DateTime time;
   List<WeatherInformation> weatherInfomations;
   CurrentLocationInfo(
-      {required this.dateTime,
-      required this.location,
+      {required this.location,
       this.isAddedToFavourite = false,
       required this.climateIcon,
       required this.temperature,
       this.isCelsius = true,
       required this.weatherStatus,
+      required this.date,
+      required this.time,
       required this.weatherInfomations});
 }
 

@@ -20,12 +20,12 @@ class HomeWidget extends StatelessWidget {
             alignment: Alignment.center,
             padding: const EdgeInsets.all(40),
             child: Column(
-              children: const [
+              children: [
                 Expanded(
                   child: CurrentLocationInformation(),
                 ),
-                Expanded(
-                  flex: 2,
+                const Expanded(
+                  flex: 3,
                   child: WeatherInformation(),
                 ),
               ],
