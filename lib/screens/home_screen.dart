@@ -10,34 +10,59 @@ import '../providers/menu_provider.dart';
 import '../widgets/scaffold_widgets/custom_background.dart';
 import '../widgets/scaffold_widgets/custom_drawer.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   bool isFirst = true;
+
   final recentSearchStorage = RecentSearchStorage();
+
   final favouritesStorage = FavouritesStorage();
+
+  bool isLoading = true;
 
   @override
   Widget build(BuildContext context) {
     if (isFirst) {
       try {
         Provider.of<DataProvider>(context, listen: false).getCurrentLocation();
-        recentSearchStorage.readRecentSearchData().then((value) {
-          if (value.isNotEmpty) {
-            value.split(' ').toSet().toList().forEach((element) {
-              // log(element);
-              Provider.of<DataProvider>(context, listen: false)
-                  .setCurrentInformationOnSearch(cityName: element);
-            });
-          }
-        }).then((value) => favouritesStorage.readFavouritesData().then((fav) {
-              if (fav.isNotEmpty) {
-                fav.split(' ').toSet().toList().forEach((element) {
-                  log('Favourite : $element');
+        recentSearchStorage
+            .readRecentSearchData()
+            .then((value) {
+              if (value.isNotEmpty) {
+                value.split(' ').toSet().toList().forEach((element) {
+                  // log(element);
                   Provider.of<DataProvider>(context, listen: false)
-                      .setFavouritesFromTheStorage(cityName: element);
+                      .setCurrentInformationOnSearch(cityName: element);
                 });
               }
-            }));
+            })
+            .then((value) => favouritesStorage.readFavouritesData().then((fav) {
+                  if (fav.isNotEmpty) {
+                    fav.split(' ').toSet().toList().forEach((element) {
+                      log('Favourite : $element');
+                      Provider.of<DataProvider>(context, listen: false)
+                          .setFavouritesFromTheStorage(cityName: element);
+                    });
+                  }
+                }))
+            .then(
+              (value) {
+                Future.delayed(
+                  Duration.zero,
+                  () {
+                    setState(() {
+                      isLoading = false;
+                    });
+                  },
+                );
+              },
+            );
       } catch (e) {
         Provider.of<DataProvider>(context, listen: false).getCurrentLocation();
       }
@@ -48,11 +73,15 @@ class HomeScreen extends StatelessWidget {
 
     return SafeArea(
       child: CustomBackground(
-        child: Scaffold(
-          appBar: menuProvider.selectedAppbar,
-          drawer: const CustomDrawer(),
-          body: menuProvider.selectedWidget,
-        ),
+        child: isLoading
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : Scaffold(
+                appBar: menuProvider.selectedAppbar,
+                drawer: const CustomDrawer(),
+                body: menuProvider.selectedWidget,
+              ),
       ),
     );
   }
