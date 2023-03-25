@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import '../../providers/menu_provider.dart';
 
 class SearchAppbar extends StatefulWidget implements PreferredSizeWidget {
+  const SearchAppbar({super.key});
+
   @override
   State<SearchAppbar> createState() => _SearchAppbarState();
 

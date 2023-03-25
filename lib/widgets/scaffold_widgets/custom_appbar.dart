@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:weather_app/providers/menu_provider.dart';
 
 class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
+  const CustomAppbar({super.key});
+
   @override
   Size get preferredSize => const Size.fromHeight(60);
   @override

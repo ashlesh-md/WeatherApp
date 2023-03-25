@@ -11,7 +11,7 @@ class HomeWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final weatherInformation = Provider.of<DataProvider>(context)
-        .currentLoactionInformation
+        .currentLoactionInformation!
         .weatherInfomations;
     return Column(
       children: [
@@ -20,11 +20,11 @@ class HomeWidget extends StatelessWidget {
             alignment: Alignment.center,
             padding: const EdgeInsets.all(40),
             child: Column(
-              children: [
+              children: const [
                 Expanded(
                   child: CurrentLocationInformation(),
                 ),
-                const Expanded(
+                Expanded(
                   flex: 3,
                   child: WeatherInformation(),
                 ),

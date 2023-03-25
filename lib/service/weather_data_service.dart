@@ -13,6 +13,7 @@ class WeatherDataService {
     // 'https://api.openweathermap.org/data/2.5/weather?lat=${location.latitude}&lon=${location.longitude}&appid=$e031dcd3ad8b42c64dce6e16089389d6',
     final String weatherDataUrl =
         'https://api.openweathermap.org/data/2.5/weather?q=$cityName&appid=$apiKey&units=metric';
+    log('GetWeatherData : $weatherDataUrl');
     final url = Uri.parse(weatherDataUrl);
     final response = await http.get(url);
     if (response.statusCode == 200) {
@@ -78,23 +79,20 @@ class WeatherDataService {
     const String apiKey = 'e031dcd3ad8b42c64dce6e16089389d6';
 
     final String weatherDataUrl =
-        'https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${long}&appid=$apiKey';
+        'https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$long&appid=$apiKey';
     final url = Uri.parse(weatherDataUrl);
+    log('weatherDataUrl  $weatherDataUrl');
     final response = await http.get(url);
     if (response.statusCode == 200) {
-      log(json.decode(response.body).toString());
+      log('${json.decode(response.body)}');
       final weatherData = json.decode(response.body);
       CurrentLocationInfo? currentLocationInfo;
-      await assignWeatherData(lat: lat, long: long).then((value) async {
-        List<String> time =
-            value['time_12'].toString().split(' ').first.toString().split(':');
-        log('time : $time');
-        await getWeatherData(cityName: value['name']).then(
-          (value) {
-            currentLocationInfo = value;
-          },
-        );
-      });
+      await getWeatherData(cityName: weatherData['name']).then(
+        (value) {
+          currentLocationInfo = value;
+        },
+      );
+
       return currentLocationInfo;
     } else {
       throw Exception('Failed to load data');
@@ -103,9 +101,10 @@ class WeatherDataService {
 
   Future<Map<String, dynamic>> assignWeatherData(
       {required double lat, required double long}) async {
-    const apiKey = '667e23afdf864d1d9d89e741ed17452b';
+    const apiKey = '2fdba03c75ec4d5782397929635e931c';
     final String timeDataApi =
         'https://api.ipgeolocation.io/timezone?apiKey=$apiKey&lat=$lat&long=$long';
+    log(timeDataApi);
     final url = Uri.parse(timeDataApi);
     final response = await http.get(url);
     if (response.statusCode == 200) {

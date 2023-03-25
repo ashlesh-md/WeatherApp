@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rive/rive.dart';
@@ -13,6 +15,10 @@ class WeatherInformation extends StatelessWidget {
   Widget build(BuildContext context) {
     final DataProvider dataProvider =
         Provider.of<DataProvider>(context, listen: false);
+    if (dataProvider.currentLoactionInformation == null) {
+      log('Checked Null');
+      Provider.of<DataProvider>(context).getCurrentLocation();
+    }
     return Wrap(
       alignment: WrapAlignment.center,
       spacing: double.maxFinite,
@@ -29,7 +35,7 @@ class WeatherInformation extends StatelessWidget {
           children: [
             Text(
               double.parse(Provider.of<DataProvider>(context)
-                      .currentLoactionInformation
+                      .currentLoactionInformation!
                       .temperature)
                   .toStringAsFixed(0),
               style: const TextStyle(
@@ -44,7 +50,7 @@ class WeatherInformation extends StatelessWidget {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      if (!dataProvider.currentLoactionInformation.isCelsius) {
+                      if (!dataProvider.currentLoactionInformation!.isCelsius) {
                         dataProvider.changeDegreeCelsiusInCurrentLoaction(
                             status: true);
                       }
@@ -55,12 +61,13 @@ class WeatherInformation extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 2, vertical: 6),
                       decoration:
-                          dataProvider.currentLoactionInformation.isCelsius
+                          dataProvider.currentLoactionInformation!.isCelsius
                               ? selectedDecoration(isLeft: true)
                               : unSelectedDecoration(isLeft: true),
                       child: Text(
                         '°C ',
-                        style: dataProvider.currentLoactionInformation.isCelsius
+                        style: dataProvider
+                                .currentLoactionInformation!.isCelsius
                             ? const TextStyle(color: Colors.red, fontSize: 22)
                             : const TextStyle(
                                 color: Colors.white, fontSize: 22),
@@ -69,7 +76,7 @@ class WeatherInformation extends StatelessWidget {
                   ),
                   GestureDetector(
                     onTap: () {
-                      if (dataProvider.currentLoactionInformation.isCelsius) {
+                      if (dataProvider.currentLoactionInformation!.isCelsius) {
                         dataProvider.changeDegreeCelsiusInCurrentLoaction(
                             status: false);
                       }
@@ -80,13 +87,13 @@ class WeatherInformation extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 2, vertical: 6),
                       decoration:
-                          dataProvider.currentLoactionInformation.isCelsius
+                          dataProvider.currentLoactionInformation!.isCelsius
                               ? unSelectedDecoration(isLeft: false)
                               : selectedDecoration(isLeft: false),
                       child: Text(
                         '°F ',
                         style: !dataProvider
-                                .currentLoactionInformation.isCelsius
+                                .currentLoactionInformation!.isCelsius
                             ? const TextStyle(color: Colors.red, fontSize: 22)
                             : const TextStyle(
                                 color: Colors.white, fontSize: 22),
@@ -100,7 +107,7 @@ class WeatherInformation extends StatelessWidget {
         ),
         const SizedBox(height: 20),
         Text(
-          dataProvider.currentLoactionInformation.weatherStatus,
+          dataProvider.currentLoactionInformation!.weatherStatus,
           style: const TextStyle(color: Colors.white, fontSize: 24),
         )
       ],

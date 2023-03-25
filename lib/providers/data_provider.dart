@@ -11,7 +11,8 @@ import '../models/current_location_information.dart';
 import '../storage/recent_search_storage.dart';
 
 class DataProvider extends ChangeNotifier {
-  late CurrentLocationInfo _currentLoactionInformation;
+  CurrentLocationInfo? _currentLoactionInformation;
+
   Future<void> getCurrentLocation() async {
     final hasPermission = await _handleLocationPermission();
     if (!hasPermission) {
@@ -19,20 +20,32 @@ class DataProvider extends ChangeNotifier {
     }
     await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
         .then((Position position) async {
+      log(position.toString());
+      log('${position.latitude} ${position.longitude}');
       await WeatherDataService()
           .getWeatherDataByLatLong(
               lat: position.latitude, long: position.longitude)
           .then((value) {
+        log('CurrentLocationData getWeatherDataByLatLong : $value');
         _currentLoactionInformation = value!;
       });
-    }).catchError((e) {
-      debugPrint(e.toString());
+    }).onError((error, stackTrace) async {
+      await Geolocator.getCurrentPosition(
+              desiredAccuracy: LocationAccuracy.high)
+          .then((Position position) async {
+        await WeatherDataService()
+            .getWeatherData(cityName: 'Mangalore')
+            .then((value) {
+          log('CurrentLocationData getWeatherData : $value');
+          _currentLoactionInformation = value!;
+        });
+      });
     });
     notifyListeners();
   }
 
   void setCurrentLocationTime({required DateTime time}) {
-    _currentLoactionInformation.time = time;
+    _currentLoactionInformation!.time = time;
     notifyListeners();
   }
 
@@ -40,15 +53,41 @@ class DataProvider extends ChangeNotifier {
 
   final List<WeatherInfoTile> _recentSearches = [];
 
-  CurrentLocationInfo get currentLoactionInformation =>
+  CurrentLocationInfo? get currentLoactionInformation =>
       _currentLoactionInformation;
-  List<WeatherInfoTile> get favourites => [..._favourites];
-  List<WeatherInfoTile> get recentSearch => [..._recentSearches];
+  List<WeatherInfoTile> get favourites {
+    var temp = [];
+    List<WeatherInfoTile> tempFavourites = [];
+    for (var search in _favourites) {
+      if (!temp.contains(search.location)) {
+        temp.add(search.location);
+        tempFavourites.add(search);
+      }
+    }
+    _favourites.clear();
+    _favourites.addAll(tempFavourites);
+    return [..._favourites.toSet().toList()];
+  }
+
+  List<WeatherInfoTile> get recentSearch {
+    var temp = [];
+    List<WeatherInfoTile> tempSearches = [];
+    for (var search in _recentSearches) {
+      if (!temp.contains(search.location)) {
+        temp.add(search.location);
+        tempSearches.add(search);
+      }
+    }
+    _recentSearches.clear();
+    _recentSearches.addAll(tempSearches);
+    return [..._recentSearches.toSet().toList()];
+  }
+
   String _temporaryTemprature = '';
 
   void clearRecentSearches() {
-    getCurrentLocation();
     RecentSearchStorage().deleteRecentSearchData();
+    _recentSearches.clear();
     Fluttertoast.showToast(
         msg: 'All the recent searches are cleared',
         toastLength: Toast.LENGTH_SHORT,
@@ -60,32 +99,12 @@ class DataProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // void clearRecentSearches() {
-  //   var temp = [..._favourites.sublist(0, _favourites.length - 1)];
-  //   for (var element in _favourites) {
-  //     if (_recentSearches.contains(element)) {
-  //       temp.remove(element);
-  //     }
-  //   }
-  //   _favourites.clear();
-  //   _favourites.addAll(temp);
-  //   _recentSearches.clear();
-  //   Fluttertoast.showToast(
-  //       msg: 'All the recent searches are cleared',
-  //       toastLength: Toast.LENGTH_SHORT,
-  //       gravity: ToastGravity.BOTTOM,
-  //       timeInSecForIosWeb: 1,
-  //       backgroundColor: Colors.black.withOpacity(0.8),
-  //       textColor: Colors.white,
-  //       fontSize: 16.0);
-  //   notifyListeners();
-  // }
   void clearFavourites() {
     FavouritesStorage().deleteFavouritesData();
 
     for (var element in _favourites) {
-      if (element.id == _currentLoactionInformation.currentLocationId) {
-        _currentLoactionInformation.isAddedToFavourite = false;
+      if (element.id == _currentLoactionInformation!.currentLocationId) {
+        _currentLoactionInformation!.isAddedToFavourite = false;
       }
       if (_recentSearches.contains(element)) {
         _recentSearches[_recentSearches.indexOf(element)].isAddedToFavourite =
@@ -106,44 +125,51 @@ class DataProvider extends ChangeNotifier {
   }
 
   void changeFavouriteStatusOfCurrentLoaction() {
-    _currentLoactionInformation.isAddedToFavourite =
-        !_currentLoactionInformation.isAddedToFavourite;
+    _favourites.removeWhere(
+        (element) => element.location == currentLoactionInformation!.location);
+    _currentLoactionInformation!.isAddedToFavourite =
+        !_currentLoactionInformation!.isAddedToFavourite;
+
     WeatherInfoTile weatherData;
-    if (_currentLoactionInformation.isAddedToFavourite) {
+    if (_currentLoactionInformation!.isAddedToFavourite) {
       if (_recentSearches.isNotEmpty) {
         _recentSearches.last.isAddedToFavourite = true;
         weatherData = _recentSearches.last;
       } else {
         weatherData = WeatherInfoTile(
-            climateIcon: _currentLoactionInformation.climateIcon,
-            location: _currentLoactionInformation.location,
-            temperature: _currentLoactionInformation.temperature,
-            weatherStatus: _currentLoactionInformation.weatherStatus,
-            isAddedToFavourite: _currentLoactionInformation.isAddedToFavourite);
+            climateIcon: _currentLoactionInformation!.climateIcon,
+            location: _currentLoactionInformation!.location,
+            temperature: _currentLoactionInformation!.temperature,
+            weatherStatus: _currentLoactionInformation!.weatherStatus,
+            isAddedToFavourite:
+                _currentLoactionInformation!.isAddedToFavourite);
       }
 
       if (!_favourites.contains(weatherData)) _favourites.add(weatherData);
-      // if (_recentSearches.contains(weatherData)) {
-      //   _recentSearches[_recentSearches.indexOf(weatherData)]
-      //       .isAddedToFavourite = true;
-      // }
-      _currentLoactionInformation.currentLocationId = _favourites.last.id;
+      if (_recentSearches.contains(weatherData)) {
+        _recentSearches[_recentSearches.indexOf(weatherData)]
+            .isAddedToFavourite = true;
+      }
+      _currentLoactionInformation!.currentLocationId = _favourites.last.id;
       if (_recentSearches.contains(weatherData)) {
         _recentSearches[_recentSearches.indexOf(weatherData)]
             .isAddedToFavourite = true;
       }
     } else {
-      _favourites.removeWhere((element) =>
-          element.id == _currentLoactionInformation.currentLocationId);
+      for (var element in _recentSearches) {
+        if (element.location == currentLoactionInformation!.location) {
+          element.isAddedToFavourite = false;
+        }
+      }
     }
     for (var element in _recentSearches) {
       log('$element' 'Addded');
-      if (element.location == _currentLoactionInformation.location) {
+      if (element.location == _currentLoactionInformation!.location) {
         element.isAddedToFavourite = true;
       }
     }
     Fluttertoast.showToast(
-        msg: _currentLoactionInformation.isAddedToFavourite
+        msg: _currentLoactionInformation!.isAddedToFavourite
             ? "Added to the favourites"
             : "Removed from the favourites",
         toastLength: Toast.LENGTH_SHORT,
@@ -156,15 +182,15 @@ class DataProvider extends ChangeNotifier {
   }
 
   void changeDegreeCelsiusInCurrentLoaction({required bool status}) {
-    if (_currentLoactionInformation.isCelsius) {
-      _temporaryTemprature = _currentLoactionInformation.temperature;
+    if (_currentLoactionInformation!.isCelsius) {
+      _temporaryTemprature = _currentLoactionInformation!.temperature;
     }
-    _currentLoactionInformation.isCelsius = status;
-    if (_currentLoactionInformation.isCelsius) {
-      _currentLoactionInformation.temperature = _temporaryTemprature;
-    } else if (!currentLoactionInformation.isCelsius) {
-      var temp = double.parse(_currentLoactionInformation.temperature);
-      _currentLoactionInformation.temperature =
+    _currentLoactionInformation!.isCelsius = status;
+    if (_currentLoactionInformation!.isCelsius) {
+      _currentLoactionInformation!.temperature = _temporaryTemprature;
+    } else if (!currentLoactionInformation!.isCelsius) {
+      var temp = double.parse(_currentLoactionInformation!.temperature);
+      _currentLoactionInformation!.temperature =
           (temp * (9 / 5) + 32).toString();
     }
     notifyListeners();
@@ -179,8 +205,8 @@ class DataProvider extends ChangeNotifier {
     } catch (e) {
       log(e.toString());
     }
-    if (_currentLoactionInformation.currentLocationId == id) {
-      _currentLoactionInformation.isAddedToFavourite = false;
+    if (_currentLoactionInformation!.currentLocationId == id) {
+      _currentLoactionInformation!.isAddedToFavourite = false;
     }
     notifyListeners();
   }
@@ -190,11 +216,19 @@ class DataProvider extends ChangeNotifier {
 
   void addAndRemoveRecentSearchFromFavouriteList({required String id}) {
     WeatherInfoTile searchElement = getRecentSearchDataById(id: id);
+    _favourites
+        .removeWhere((element) => element.location == searchElement.location);
     if (searchElement.isAddedToFavourite) {
       _favourites.remove(searchElement);
       searchElement.isAddedToFavourite = false;
+      if (searchElement.location == currentLoactionInformation!.location) {
+        currentLoactionInformation!.isAddedToFavourite = false;
+      }
     } else {
       searchElement.isAddedToFavourite = true;
+      if (searchElement.location == currentLoactionInformation!.location) {
+        currentLoactionInformation!.isAddedToFavourite = true;
+      }
       _favourites.add(searchElement);
     }
     Fluttertoast.showToast(
@@ -211,10 +245,12 @@ class DataProvider extends ChangeNotifier {
   }
 
   Future<void> setCurrentInformationOnSearch({required String cityName}) async {
-    CurrentLocationInfo? temp;
-    await WeatherDataService().getWeatherData(cityName: cityName).then((value) {
-      RecentSearchStorage().readRecentSearchData().then((value) =>
-          RecentSearchStorage().writeRecentSearchData('$value $cityName'));
+    await WeatherDataService()
+        .getWeatherData(cityName: cityName)
+        .then((value) async {
+      await RecentSearchStorage().readRecentSearchData().then((value) async =>
+          await RecentSearchStorage()
+              .writeRecentSearchData('$value $cityName'));
       _currentLoactionInformation = value!;
       _recentSearches.add(
         WeatherInfoTile(
@@ -229,9 +265,23 @@ class DataProvider extends ChangeNotifier {
   }
 
   Future<void> setFavouritesFromTheStorage({required String cityName}) async {
-    await WeatherDataService().getWeatherData(cityName: cityName).then((value) {
-      FavouritesStorage().readFavouritesData().then((value) =>
-          FavouritesStorage().writeFavouritesData('$value $cityName'));
+    bool status = true;
+    await WeatherDataService()
+        .getWeatherData(cityName: cityName)
+        .then((value) async {
+      await FavouritesStorage().readFavouritesData().then((value) async {
+        if (!value.split(' ').toSet().toList().contains(cityName)) {
+          await FavouritesStorage().writeFavouritesData('$value $cityName');
+        }
+      });
+      var temp = [..._recentSearches];
+      for (var seach in _recentSearches) {
+        if (seach.location == value!.location) {
+          temp.remove(seach);
+        }
+      }
+      _recentSearches.clear();
+      _recentSearches.addAll(temp);
       _recentSearches.add(
         WeatherInfoTile(
             climateIcon: value!.climateIcon,

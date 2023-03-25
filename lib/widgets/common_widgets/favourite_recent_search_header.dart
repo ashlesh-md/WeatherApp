@@ -56,14 +56,14 @@ class FavouriteRecentSearchHeader extends StatelessWidget {
                           log(Provider.of<DataProvider>(context, listen: false)
                               .favourites
                               .toString());
-                          print('isFavouriteScreen cleared');
+                          log('isFavouriteScreen cleared');
                         } else {
                           Provider.of<DataProvider>(context, listen: false)
                               .clearRecentSearches();
                           log(Provider.of<DataProvider>(context, listen: false)
                               .recentSearch
                               .toString());
-                          print('clearRecentSearchess cleared');
+                          log('clearRecentSearchess cleared');
                         }
                         Navigator.of(context).pop();
                       },

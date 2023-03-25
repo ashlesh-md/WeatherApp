@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -7,29 +6,47 @@ import 'package:weather_app/providers/data_provider.dart';
 
 import '../../models/current_location_information.dart';
 
-class CurrentLocationInformation extends StatelessWidget {
-  CurrentLocationInformation({
-    super.key,
-  });
-
-  bool isFirst = true;
-  DateTime time = DateTime.now();
+class CurrentLocationInformation extends StatefulWidget {
+  const CurrentLocationInformation({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    CurrentLocationInfo currentLocationData =
-        Provider.of<DataProvider>(context).currentLoactionInformation;
+  State<CurrentLocationInformation> createState() =>
+      _CurrentLocationInformationState();
+}
+
+class _CurrentLocationInformationState
+    extends State<CurrentLocationInformation> {
+  bool isFirst = true;
+
+  DateTime time = DateTime.now();
+  Timer? timer;
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     if (isFirst) {
-      // amOrPm = currentLocationData.isAm ? 'AM' : 'PM';
-      time = Provider.of<DataProvider>(context).currentLoactionInformation.time;
-      Timer.periodic(const Duration(seconds: 1), (timer) {
+      time =
+          Provider.of<DataProvider>(context).currentLoactionInformation!.time;
+      timer = Timer.periodic(const Duration(seconds: 1), (timer) {
         time = time.add(const Duration(seconds: 1));
         Provider.of<DataProvider>(context, listen: false)
             .setCurrentLocationTime(time: time);
       });
-
       isFirst = false;
     }
+  }
+
+  @override
+  void dispose() {
+    timer!.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final provider = Provider.of<DataProvider>(context);
+    CurrentLocationInfo currentLocationData =
+        provider.currentLoactionInformation!;
+
     return Wrap(
       alignment: WrapAlignment.center,
       spacing: double.maxFinite,
