@@ -30,18 +30,23 @@ class DataProvider extends ChangeNotifier {
         _currentLoactionInformation = value!;
       });
     }).onError((error, stackTrace) async {
-      await Geolocator.getCurrentPosition(
-              desiredAccuracy: LocationAccuracy.high)
-          .then((Position position) async {
-        await WeatherDataService()
-            .getWeatherData(cityName: 'Mangalore')
-            .then((value) {
-          log('CurrentLocationData getWeatherData : $value');
-          _currentLoactionInformation = value!;
-        });
+      await await WeatherDataService()
+          .getWeatherData(cityName: 'Mangalore')
+          .then((value) {
+        log('CurrentLocationData getWeatherData : $value');
+        _currentLoactionInformation = value!;
       });
     });
     notifyListeners();
+  }
+
+  Future<void> setDefaultLocation() async {
+    await WeatherDataService()
+        .getWeatherData(cityName: 'Mangalore')
+        .then((value) {
+      log('CurrentLocationData getWeatherData : $value');
+      _currentLoactionInformation = value!;
+    });
   }
 
   void setCurrentLocationTime({required DateTime time}) {

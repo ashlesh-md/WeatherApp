@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:flutter/material.dart';
@@ -32,8 +33,13 @@ class MyApp extends StatelessWidget {
                   backgroundColor: Colors.transparent, elevation: 0)),
           home: SafeArea(
             child: Builder(builder: (context) {
-              Provider.of<DataProvider>(context, listen: false)
-                  .getCurrentLocation();
+              if (Platform.isAndroid || Platform.isIOS) {
+                Provider.of<DataProvider>(context, listen: false)
+                    .getCurrentLocation();
+              } else {
+                Provider.of<DataProvider>(context, listen: false)
+                    .setDefaultLocation();
+              }
               recentSearchStorage.readRecentSearchData().then((recent) {
                 if (recent.isNotEmpty) {
                   recent.split(' ').toSet().toList().forEach((element) {
