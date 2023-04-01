@@ -12,7 +12,7 @@ class FavouritesStorage {
 
   Future<File> get _localFile async {
     final path = await _localPath;
-    return File('$path/favourites_data.txt');
+    return File('$path/favourites.txt');
   }
 
   Future<String> readFavouritesData() async {

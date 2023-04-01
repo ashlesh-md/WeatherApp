@@ -30,7 +30,8 @@ class DataProvider extends ChangeNotifier {
         _currentLoactionInformation = value!;
       });
     }).onError((error, stackTrace) async {
-      await await WeatherDataService()
+      print(error);
+      await WeatherDataService()
           .getWeatherData(cityName: 'Mangalore')
           .then((value) {
         log('CurrentLocationData getWeatherData : $value');
@@ -148,6 +149,7 @@ class DataProvider extends ChangeNotifier {
             weatherStatus: _currentLoactionInformation!.weatherStatus,
             isAddedToFavourite:
                 _currentLoactionInformation!.isAddedToFavourite);
+        _favourites.add(weatherData);
       }
 
       if (!_favourites.contains(weatherData)) _favourites.add(weatherData);
@@ -235,6 +237,16 @@ class DataProvider extends ChangeNotifier {
         currentLoactionInformation!.isAddedToFavourite = true;
       }
       _favourites.add(searchElement);
+      FavouritesStorage().readFavouritesData().then((fav) {
+        print(fav);
+        if (fav.isNotEmpty) {
+          fav.split('\n').toSet().toList().forEach((element) {
+            log('Favourite : $element');
+            log('Favourites : ${fav.split('\n').toSet().toList()}');
+            setFavouritesFromTheStorage(cityName: element);
+          });
+        }
+      });
     }
     Fluttertoast.showToast(
         msg: searchElement.isAddedToFavourite
@@ -255,7 +267,7 @@ class DataProvider extends ChangeNotifier {
         .then((value) async {
       await RecentSearchStorage().readRecentSearchData().then((value) async =>
           await RecentSearchStorage()
-              .writeRecentSearchData('$value $cityName'));
+              .writeRecentSearchData('$value\n$cityName'));
       _currentLoactionInformation = value!;
       _recentSearches.add(
         WeatherInfoTile(
@@ -270,30 +282,27 @@ class DataProvider extends ChangeNotifier {
   }
 
   Future<void> setFavouritesFromTheStorage({required String cityName}) async {
-    bool status = true;
     await WeatherDataService()
         .getWeatherData(cityName: cityName)
         .then((value) async {
       await FavouritesStorage().readFavouritesData().then((value) async {
-        if (!value.split(' ').toSet().toList().contains(cityName)) {
-          await FavouritesStorage().writeFavouritesData('$value $cityName');
-        }
+        await FavouritesStorage().writeFavouritesData('$value\n$cityName');
       });
-      var temp = [..._recentSearches];
-      for (var seach in _recentSearches) {
-        if (seach.location == value!.location) {
-          temp.remove(seach);
-        }
-      }
-      _recentSearches.clear();
-      _recentSearches.addAll(temp);
-      _recentSearches.add(
+      // var temp = [..._favourites];
+      // for (var seach in _favourites) {
+      //   if (seach.location == value!.location) {
+      //     temp.remove(seach);
+      //   }
+      // }
+      // _favourites.clear();
+      // _favourites.addAll(temp);
+      _favourites.add(
         WeatherInfoTile(
             climateIcon: value!.climateIcon,
             location: value.location,
             temperature: value.temperature,
             weatherStatus: value.weatherStatus,
-            isAddedToFavourite: value.isAddedToFavourite),
+            isAddedToFavourite: true),
       );
     });
     notifyListeners();
@@ -305,8 +314,6 @@ class DataProvider extends ChangeNotifier {
 
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-      //     content: Text('Location services are disabled. Please enable the services')));
       log('Location services are disabled. Please enable the services');
       return false;
     }
@@ -314,15 +321,11 @@ class DataProvider extends ChangeNotifier {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //     const SnackBar(content: Text('Location permissions are denied')));
         log('Location permissions are denied');
         return false;
       }
     }
     if (permission == LocationPermission.deniedForever) {
-      // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-      //     content: Text('Location permissions are permanently denied, we cannot request permissions.')));
       log('Location permissions are permanently denied, we cannot request permissions.');
       return false;
     }

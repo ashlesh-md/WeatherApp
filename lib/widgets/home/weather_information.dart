@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rive/rive.dart';
@@ -15,10 +13,6 @@ class WeatherInformation extends StatelessWidget {
   Widget build(BuildContext context) {
     final DataProvider dataProvider =
         Provider.of<DataProvider>(context, listen: false);
-    if (dataProvider.currentLoactionInformation == null) {
-      log('Checked Null');
-      Provider.of<DataProvider>(context).getCurrentLocation();
-    }
     return Wrap(
       alignment: WrapAlignment.center,
       spacing: double.maxFinite,

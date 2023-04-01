@@ -33,33 +33,44 @@ class MyApp extends StatelessWidget {
                   backgroundColor: Colors.transparent, elevation: 0)),
           home: SafeArea(
             child: Builder(builder: (context) {
-              if (Platform.isAndroid || Platform.isIOS) {
-                Provider.of<DataProvider>(context, listen: false)
-                    .getCurrentLocation();
-              } else {
-                Provider.of<DataProvider>(context, listen: false)
-                    .setDefaultLocation();
-              }
+              favouritesStorage.readFavouritesData().then((fav) {
+                print('Favourites : $fav');
+                if (fav.isNotEmpty) {
+                  'Mangalore\nMysore\n\\ooty'
+                      .split('\n')
+                      .toSet()
+                      .toList()
+                      .forEach((element) {
+                    log('Favourite : $element');
+                    log('Favourites : ${fav.split('\n').toSet().toList()}');
+                    Provider.of<DataProvider>(context, listen: false)
+                        .setFavouritesFromTheStorage(cityName: element);
+                  });
+                }
+              });
               recentSearchStorage.readRecentSearchData().then((recent) {
                 if (recent.isNotEmpty) {
-                  recent.split(' ').toSet().toList().forEach((element) {
-                    log(recent.split(' ').toSet().toList().toString());
+                  recent.split('\n').toSet().toList().forEach((element) {
+                    log(recent.split('\n').toSet().toList().toString());
                     Provider.of<DataProvider>(context, listen: false)
                         .setCurrentInformationOnSearch(cityName: element);
                   });
                 }
-              }).then(
-                  (value) => favouritesStorage.readFavouritesData().then((fav) {
-                        if (fav.isNotEmpty) {
-                          fav.split(' ').toSet().toList().forEach((element) {
-                            log('Favourite : $element');
-                            log(fav.split(' ').toSet().toList().toString());
+              });
 
-                            Provider.of<DataProvider>(context, listen: false)
-                                .setFavouritesFromTheStorage(cityName: element);
-                          });
-                        }
-                      }));
+              if (Provider.of<DataProvider>(context, listen: false)
+                      .currentLoactionInformation ==
+                  null) {
+                if (Platform.isAndroid || Platform.isIOS) {
+                  log('Get Currentlocation');
+                  Provider.of<DataProvider>(context, listen: false)
+                      .getCurrentLocation();
+                } else {
+                  log('Get setDefaultLocation');
+                  Provider.of<DataProvider>(context, listen: false)
+                      .setDefaultLocation();
+                }
+              }
               return Container(
                 decoration: const BoxDecoration(
                     image: DecorationImage(

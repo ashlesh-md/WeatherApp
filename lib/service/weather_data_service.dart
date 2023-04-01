@@ -77,7 +77,6 @@ class WeatherDataService {
   Future<CurrentLocationInfo?> getWeatherDataByLatLong(
       {required double lat, required double long}) async {
     const String apiKey = 'e031dcd3ad8b42c64dce6e16089389d6';
-
     final String weatherDataUrl =
         'https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$long&appid=$apiKey';
     final url = Uri.parse(weatherDataUrl);
@@ -92,7 +91,7 @@ class WeatherDataService {
           currentLocationInfo = value;
         },
       );
-
+      print('Returened Resopnce');
       return currentLocationInfo;
     } else {
       throw Exception('Failed to load data');
